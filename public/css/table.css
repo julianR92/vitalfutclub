@@ -1,0 +1,36 @@
+@media (max-width: 640px) {
+    .tablas thead {
+      display: none;
+    }
+  
+    .tablas,
+    .tablas tbody,
+    .tablas tr,
+    .tablas td {
+      display: block;
+      width: 100%;
+    }
+    .tablas tr {
+      margin-bottom: 15px;
+    }
+    .tablas td {
+      padding-left: 50%;
+      text-align: left;
+      position: relative;
+    }
+    .tablas td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 0;
+      width: 50%;
+      padding-left: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
+  
+    }
+    .email-td{
+      font-size: 12px;
+
+    }
+  }
