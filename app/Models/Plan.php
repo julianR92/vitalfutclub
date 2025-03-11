@@ -25,7 +25,8 @@ class Plan extends Model
         'visible_web',
         'orden',
         'descuento',
-        'tipo_plan'
+        'tipo_plan',
+        'status'
     ];
 
      protected $casts = [
@@ -35,6 +36,7 @@ class Plan extends Model
         'visible_web' => 'boolean',
         'orden' => 'integer',
         'descuento' => 'decimal:2',
+        'status' => 'integer',
     ];
 
     protected $appends = [

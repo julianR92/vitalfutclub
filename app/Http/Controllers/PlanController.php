@@ -30,6 +30,13 @@ class PlanController extends Controller
                 ->select('planes.*')
                 ->get()
                 ->sort(function ($a, $b) {
+                    // 0. Primero por status (activos primero: 1, inactivos al final: 0)
+                    $statusA = $a->status ?? 1;
+                    $statusB = $b->status ?? 1;
+                    if ($statusA != $statusB) {
+                        return $statusB <=> $statusA;
+                    }
+
                     // 1. Primero por visible_web (visibles primero: 1, luego 0)
                     if ($a->visible_web != $b->visible_web) {
                         return $b->visible_web <=> $a->visible_web;
@@ -61,6 +68,7 @@ class PlanController extends Controller
                         'descuento' => $plan->descuento > 0 ? $plan->descuento . '%' : '-',
                         'visible_web' => $plan->visible_web,
                         'orden' => $plan->orden,
+                        'status' => $plan->status ?? 1,
                         'detalles_count' => $plan->detalles->count(),
                     ];
                 });
@@ -103,9 +111,11 @@ class PlanController extends Controller
                 'orden' => 'nullable|integer|min:0',
                 'descuento' => 'nullable|numeric|min:0|max:100',
                 'tipo_plan' => 'required|in:suscripcion,prepago',
+                'status' => 'nullable|boolean',
             ]);
 
             $validated['visible_web'] = $request->has('visible_web') ? 1 : 0;
+            $validated['status'] = 1; // Por defecto, los planes nuevos están activos
             $validated['orden'] = $validated['orden'] ?? 0;
             $validated['descuento'] = $validated['descuento'] ?? 0;
 
@@ -174,9 +184,11 @@ class PlanController extends Controller
                 'orden' => 'nullable|integer|min:0',
                 'descuento' => 'nullable|numeric|min:0|max:100',
                 'tipo_plan' => 'required|in:suscripcion,prepago',
+                'status' => 'nullable|boolean',
             ]);
 
             $validated['visible_web'] = $request->has('visible_web') ? 1 : 0;
+            $validated['status'] = $request->has('status') ? 1 : 0;
             $validated['orden'] = $validated['orden'] ?? 0;
             $validated['descuento'] = $validated['descuento'] ?? 0;
 

@@ -214,7 +214,8 @@ class PlanApiController extends Controller
                 'ciudad:id,nombre,codigo',
                 'sede:id,nombre_sede,direccion,telefono,persona_cargo'
             ])
-            ->where('visible_web', true)
+            ->where('visible_web', 1)
+            ->where('status', 1)
             ->orderBy('orden', 'asc')
             ->orderBy('precio_final', 'asc')
             ->get()

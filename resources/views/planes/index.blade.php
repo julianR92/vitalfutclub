@@ -36,6 +36,7 @@
                                             <th>Precio Final</th>
                                             <th>Detalles</th>
                                             <th>Visible Web</th>
+                                            <th>Estado</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -117,6 +118,17 @@
                         }
                     },
                     {
+                        data: 'status',
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            if (data == 1) {
+                                return '<span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>Activo</span>';
+                            } else {
+                                return '<span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-400 text-gray-800"><i class="fas fa-ban mr-1"></i>Inactivo</span>';
+                            }
+                        }
+                    },
+                    {
                         data: null,
                         orderable: false,
                         searchable: false,
@@ -144,7 +156,14 @@
                 order: [],
                 // order: [[10, 'asc'], [1, 'asc']],
                 pageLength: 10,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                createdRow: function(row, data, dataIndex) {
+                    // Aplicar estilo gris opaco si el plan está inactivo
+                    if (data.status == 0) {
+                        $(row).addClass('opacity-50 bg-gray-100');
+                        $(row).find('td').addClass('text-gray-500');
+                    }
+                }
             });
 
             // Mostrar mensaje de éxito si existe

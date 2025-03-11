@@ -184,6 +184,16 @@
                                         </label>
                                     </div>
 
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="status" id="status" value="1"
+                                               class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                               {{ old('status', $plan->status ?? 1) ? 'checked' : '' }}>
+                                        <label for="status" class="ml-2 block text-sm font-medium text-gray-700">
+                                            <i class="fas fa-check-circle mr-1"></i>Plan Activo
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Los planes inactivos no podrán ser editados ni asignados a clientes</p>
+
                                     <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                                         <h4 class="text-sm font-semibold text-yellow-800 mb-2">
                                             <i class="fas fa-exclamation-triangle mr-1"></i>Advertencia

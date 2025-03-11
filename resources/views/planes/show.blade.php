@@ -120,6 +120,20 @@
                                                 </span>
                                             @endif
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="block text-sm font-medium text-gray-600">Estado del Plan:</label>
+                                            @if (($plan->status ?? 1) == 1)
+                                                <span
+                                                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i>Activo
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-gray-400 text-gray-800">
+                                                    <i class="fas fa-ban mr-1"></i>Inactivo
+                                                </span>
+                                            @endif
+                                        </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600">Orden:</label>
                                             <p class="text-gray-900 font-semibold">{{ $plan->orden }}</p>

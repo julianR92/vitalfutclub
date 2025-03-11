@@ -46,7 +46,7 @@ class Modal extends Component
     public function render()
     {
         return view('livewire.per-planes.modal',[
-            'planes' => Plan::where('tipo_plan', 'prepago')->get(),
+            'planes' => Plan::where('tipo_plan', 'prepago')->where('status', 1)->get(),
             'sedes'=>Sede::all()]);
     }
 
