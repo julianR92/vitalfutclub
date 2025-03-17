@@ -216,7 +216,7 @@
 									</svg>
 								</a>
 							</div>
-							
+
 							@endif
 							@if(Auth::user()->rol=='admin')
 							{{-- fabian --}}
@@ -247,6 +247,32 @@
 
 								</a>
 							</div>
+							@endif
+                            @if(Auth::user()->rol=='admin'|| Auth::user()->rol=='profesor')
+
+							<div
+								class="p-8 space-y-3 border-2 border-orange-400 rounded-xl hover:shadow-orange-400/60 hover:shadow-2xl hover:bg-gray-50">
+								<span class="inline-block text-gray-500 dark:text-gray-400">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 20 20"><!-- Icon from All by undefined - undefined --><path fill="currentColor" d="M12.437 3.25A5 5 0 0 0 10.001 5a5 5 0 0 0-2.437-1.75A3 3 0 0 1 10.001 2c1.003 0 1.892.493 2.436 1.25m-8.81 7.97a6.504 6.504 0 0 1 5.85-5.2a4 4 0 1 0-5.85 5.199m12.747 0a4 4 0 1 0-5.85-5.199a6.504 6.504 0 0 1 5.85 5.199M15.5 12.5a5.5 5.5 0 1 1-11 0a5.5 5.5 0 0 1 11 0m-7.5-2a.5.5 0 0 0 .5.5h2.24q-.154.22-.32.485c-.483.772-1.028 1.846-1.166 2.953a.5.5 0 1 0 .992.124c.112-.893.567-1.819 1.022-2.547a11 11 0 0 1 .843-1.168l.012-.014l.004-.004A.5.5 0 0 0 11.75 10H8.5a.5.5 0 0 0-.5.5"/></svg>
+								</span>
+
+								<h1 class="text-2xl font-semibold text-gray-700 capitalize dark:text-white">
+									Administración de sorteos</h1>
+
+								<p class="text-gray-500 dark:text-gray-300" style="text-align:justify;">
+									Esta opción para crear y gestionar los sorteos de los torneos internos Vitalfut
+								</p>
+
+								<a href="{{ route('sorteo.index') }}"
+									class="inline-flex p-2 text-gray-700 capitalize transition-colors duration-200 transform bg-gray-200 rounded-full dark:bg-gray-500 dark:text-white hover:underline hover:text-gray-600 dark:hover:text-gray-500">
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</a>
+							</div>
+
 							@endif
 							<!--{{-- lo nuevo 2024-10-28 --}}-->
 

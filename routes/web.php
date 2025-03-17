@@ -107,13 +107,35 @@ Route::post('/jugador/store', [App\Http\Controllers\TorneoController::class, 'st
 Route::get('/congelacion-plan/index', [App\Http\Controllers\CongelacionPlanesController::class, 'index'])->middleware(['auth:sanctum', 'verified'])->name('congelacion.index');
 Route::post('/congelacion-plan', [App\Http\Controllers\CongelacionPlanesController::class, 'store'])->middleware(['auth:sanctum', 'verified'])->name('congelacion.store');
 
+//sorteos
+Route::get('/sorteo', [App\Http\Controllers\SorteoController::class, 'index'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.index');
+Route::get('/sorteo/getData', [App\Http\Controllers\SorteoController::class, 'getData'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.getData');
+Route::post('/sorteo/store', [App\Http\Controllers\SorteoController::class, 'store'])->middleware(['auth:sanctum', 'verified'])->name('sorteo');
+Route::get('/sorteo/delete/{id}', [App\Http\Controllers\SorteoController::class, 'sorteoDelete'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.delete');
+Route::get('/sorteo/data/{id}', [App\Http\Controllers\SorteoController::class, 'sorteoData'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.data');
+Route::get('/sorteo/jugadores/getData/{id}', [App\Http\Controllers\SorteoController::class, 'getDataClientes'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.getJugadores');
+Route::post('/sorteo/add/players', [App\Http\Controllers\SorteoController::class, 'addPlayers'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.addPlayers');
+Route::get('/sorteo/jugadores/{id}', [App\Http\Controllers\SorteoController::class, 'getSorteoJugadores'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.jugadores.incluidos');
+Route::get('/jugador/delete/{id}', [App\Http\Controllers\SorteoController::class, 'jugadorDelete'])->middleware(['auth:sanctum', 'verified'])->name('jugador.sorteo.delete');
+Route::get('/finish/selection/{id}', [App\Http\Controllers\SorteoController::class, 'finishSelection'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.finish.selection');
+Route::post('/sorteo/numero-equipos', [App\Http\Controllers\SorteoController::class, 'teamNumber'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.teamNumber');
+Route::post('/sorteo/actualizar-clasificacion', [App\Http\Controllers\SorteoController::class, 'updateClasificacion'])->middleware(['auth:sanctum', 'verified'])->name('update.clasificacion');
+Route::get('/sorteo/validate/{id}', [App\Http\Controllers\SorteoController::class, 'validateClasificacion'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.validar');
+Route::get('/sorteo/create/{id}', [App\Http\Controllers\SorteoController::class, 'createSorteo'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.create');
+Route::post('/sorteo/finalizar', [App\Http\Controllers\SorteoController::class, 'endingSorteo'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.finalizar');
+
+
+
+
+
+
 // Route::get('/pruebas', function (){
 //       $id = 1343;
 //         //generate pdf
 //         $empresa = Job::all();
 //         $plan_activo = PerPlanes::join('planes', 'planes.id', '=', 'per_planes.plan_id')->join('personas', 'personas.id', '=', 'per_planes.persona_id')
-//         ->where('per_planes.persona_id', 6)->where('per_planes.estado', 1)->get();       
-//         $hoy = date("Y-m-d");	
+//         ->where('per_planes.persona_id', 6)->where('per_planes.estado', 1)->get();
+//         $hoy = date("Y-m-d");
 //     $pdf = app('dompdf.wrapper');
 //     $pdf->loadView('factura.factura',compact('empresa','plan_activo', 'hoy', 'id'));
 //     return $pdf->stream();
