@@ -123,6 +123,8 @@ Route::post('/sorteo/actualizar-clasificacion', [App\Http\Controllers\SorteoCont
 Route::get('/sorteo/validate/{id}', [App\Http\Controllers\SorteoController::class, 'validateClasificacion'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.validar');
 Route::get('/sorteo/create/{id}', [App\Http\Controllers\SorteoController::class, 'createSorteo'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.create');
 Route::post('/sorteo/finalizar', [App\Http\Controllers\SorteoController::class, 'endingSorteo'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.finalizar');
+Route::post('/sorteo/descargar', [App\Http\Controllers\SorteoController::class, 'downloadSorteo'])->middleware(['auth:sanctum', 'verified'])->name('sorteo.descargar');
+
 
 
 

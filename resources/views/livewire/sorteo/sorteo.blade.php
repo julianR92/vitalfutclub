@@ -1010,7 +1010,50 @@
 
                     }
                     if (e.target.matches('#btnDescargar') || e.target.closest('#btnDescargar')) {
-                        captureTablesToPDF();
+                        //captureTablesToPDF();
+                        var sorteo_id = "{{ $sorteo->id }}";
+                        let equipos = JSON.parse(localStorage.getItem('equipos'));
+                        const requestData = {
+                            id: parseInt(sorteo_id),
+                            equipos: equipos
+                        };
+                        if (sorteo_id && equipos) {
+
+
+                            $.ajax({
+                                url: `/sorteo/descargar`,
+                                type: 'POST',
+                                data: JSON.stringify(requestData),
+                                contentType: 'application/json',
+                                xhrFields: {
+                                    responseType: 'blob' // Indicar que la respuesta es un archivo
+                                },
+                                success: function(response, status, xhr) {
+                                    // Obtener el nombre del archivo desde los headers (opcional)
+                                    var blob = new Blob([response], {
+                                        type: 'application/pdf'
+                                    });
+
+                                    // Crear un enlace de descarga
+                                    var link = document.createElement('a');
+                                    link.href = window.URL.createObjectURL(blob);
+                                    link.download = `Sorteo-Vitalfut-${sorteo_id}.pdf`;
+
+                                    // Agregar y hacer clic en el enlace
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+
+
+
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    toastr.error('¡Se produjo el error! ' + textStatus,
+                                        'Intenta mas tarde');
+
+                                }
+                            });
+                        }
 
                     }
                     if (e.target.matches('.divFinal') || e.target.closest('.divFinal')) {
@@ -1258,7 +1301,7 @@
                                         }
 
                                         pdf.addImage(img, "PNG", 10, yPosition, imgWidth,
-                                        imgHeight);
+                                            imgHeight);
                                         yPosition += imgHeight + 10;
                                         resolve();
                                     };

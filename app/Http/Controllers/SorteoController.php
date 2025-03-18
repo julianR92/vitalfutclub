@@ -18,6 +18,7 @@ use App\Models\SorteoEquipoJugador;
 use App\Models\SorteoJugador;
 use Exception;
 use Illuminate\Validation\Rule;
+use PDF;
 
 class SorteoController extends Controller
 {
@@ -443,5 +444,18 @@ class SorteoController extends Controller
         } catch (Exception $e) {
             return response()->json(['success' => false, 'errors' => [$e->getMessage()]]);
         }
+    }
+
+    public function downloadSorteo(Request $request)
+    {
+        $datos = SorteoEquipo::where('sorteo_id', $request->id)->with(['sorteo.sede','jugadores.jugador'])->get();
+        $equipos = $request->equipos;
+        $pdf = PDF::loadView('exports.sorteo-pdf', compact('datos', 'equipos'))->setPaper('letter', 'portrait');
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="Sorteo-Vitalfut-' . $request->id . '.pdf"',
+        ]);
+
+
     }
 }
