@@ -301,6 +301,8 @@
             <h1 class="text-2xl font-semibold text-gray-900">
                 Sorteo Finalizado: {{ $sorteo->updated_at->format('d-m-Y') }}
             </h1>
+            <button class="px-4 py-2 bg-orange-500 text-white rounded-lg shadow-md hover:bg-orange-600 transition" id="btnDescargarFinal">Descargar</button>
+
         </div>
         <div class="flex flex-wrap gap-4 justify-center mt-6 mb-6 divFinal">
             @foreach ($equipos_jugadores as $index => $equipo)
@@ -325,8 +327,17 @@
 
                                     </tr>
                                 @endforeach
+
                             </tbody>
                         </table>
+                        <div class="flex items-center space-x-2 mt-3 controls">
+                            <button
+                                class="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md text-sm flex items-center justify-center h-9 mr-2 addPlayer"
+                                title="Agregar Jugador" data-sorteo="{{ $sorteo->id }}"
+                                data-equipo="{{ $equipo['id'] }}">
+                                +
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -521,7 +532,7 @@
                                     return `
                                 <div class="stepper-container">
                                     <button class="btn-stepper btn-decrement" data-id="${row.id}" ${disabled}>-</button>
-                                    <input type="number" class="input-clasificacion" data-id="${row.id}" value="${row.clasificacion}" min="1" max="5" readonly>
+                                    <input type="number" class="input-clasificacion" data-id="${row.id}" value="${row.clasificacion}" min="1" max="7" readonly>
                                     <button class="btn-stepper btn-increment" data-id="${row.id}" ${disabled}>+</button>
                                 </div>
             `;
@@ -608,7 +619,7 @@
                         let id = $(this).data('id');
                         let valor = parseInt(input.val());
 
-                        if (valor < 5) {
+                        if (valor < 7) {
                             valor++;
                             input.val(valor).trigger('change');
 
@@ -635,7 +646,7 @@
                         let valor = parseInt(input.val());
 
                         // Validar el rango del número
-                        if (valor < 1 || valor > 5 || isNaN(valor)) {
+                        if (valor < 1 || valor > 7 || isNaN(valor)) {
                             input.val(1);
                             valor = 1;
                         }
@@ -1179,6 +1190,141 @@
 
                             }
                         });
+
+                    }
+
+                    if (e.target.matches('.addPlayer') || e.target.closest('.addPlayer')) {
+                        let sorteo_id = parseInt(e.target.dataset.sorteo);
+                        let equipo_id = parseInt(e.target.dataset.equipo);
+                        const controls = e.target.parentElement
+
+                        if (document.getElementById('selectPlayer')) return;
+
+                        // Crear select
+                        const select = document.createElement('select');
+                        select.id = 'selectPlayer';
+                        select.className = 'border border-gray-300 rounded-md px-3 py-2 text-sm h-9 focus:outline-none focus:ring-2 focus:ring-blue-500';
+
+                        // Crear botón de confirmación
+                        const button = document.createElement('button');
+                        button.id = 'confirmPlayer';
+                        button.dataset.sorteo = sorteo_id;
+                        button.dataset.equipo = equipo_id;
+                        button.className = 'bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md text-sm flex items-center justify-center h-9 ml-2';
+                        button.innerHTML = '🗸'; // o puedes usar solo un icono si prefieres
+
+                        // Insertarlos al lado del botón +
+                        controls.appendChild(select);
+                        controls.appendChild(button);
+
+                        $.ajax({
+                            url: `/sorteo/jugadores/getData/${sorteo_id}`,
+                            type: 'GET',
+                            success: function(response) {
+                                response?.data.forEach(jugador => {
+                                    const option = document.createElement('option');
+                                    option.value = jugador.id;
+                                    option.text = jugador.nombres + ' ' + jugador.apellidos;
+                                    select.appendChild(option);
+                                });
+
+
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                toastr.error('¡Se produjo el error! ' + textStatus,
+                                    'Intenta mas tarde');
+
+                            }
+                        });
+
+                    }
+                    if (e.target.matches('#confirmPlayer') || e.target.closest('#confirmPlayer')) {
+                        let sorteo_id = parseInt(e.target.dataset.sorteo);
+                        let equipo_id = parseInt(e.target.dataset.equipo);
+                        const jugador_id = document.getElementById('selectPlayer').value;
+                        console.log(jugador_id);
+                        if (sorteo_id && equipo_id && jugador_id) {
+                            datos = {
+                                sorteo_id: sorteo_id,
+                                equipo_id: equipo_id,
+                                jugador_id: jugador_id
+                            }
+                            $.ajax({
+                                url: `/sorteo/update/equipo`,
+                                type: 'POST',
+                                data: JSON.stringify(datos), // Convertimos a JSON
+                                contentType: 'application/json',
+                                processData: false,
+                                success: function(response) {
+                                    if (response.success) {
+                                        toastr.success('Equipo actualizado', 'Éxito');
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 2500)
+
+                                    } else {
+                                        toastr.error('Error al actualizar el equipo', 'Error');
+                                    }
+
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    Swal.close();
+                                    toastr.error('¡Se produjo el error! ' + textStatus,
+                                        'Intenta mas tarde');
+
+                                }
+                            });
+
+                        } else {
+                            toastr.error('¡Se produjo el error!', 'Intenta mas tarde');
+                        }
+
+
+                    }
+
+                    if (e.target.matches('#btnDescargarFinal') || e.target.closest('#btnDescargarFinal')) {
+                        //captureTablesToPDF();
+                        var sorteo_id = "{{ $sorteo->id }}";
+                        const requestData = {
+                            id: parseInt(sorteo_id),
+                        };
+
+                        if (sorteo_id) {
+
+
+                            $.ajax({
+                                url: `/sorteo/descargar/final`,
+                                type: 'POST',
+                                data: JSON.stringify(requestData),
+                                contentType: 'application/json',
+                                xhrFields: {
+                                    responseType: 'blob' // Indicar que la respuesta es un archivo
+                                },
+                                success: function(response, status, xhr) {
+                                    var blob = new Blob([response], {
+                                        type: 'application/pdf'
+                                    });
+
+                                    // Crear un enlace de descarga
+                                    var link = document.createElement('a');
+                                    link.href = window.URL.createObjectURL(blob);
+                                    link.download = `Sorteo-Vitalfut-${sorteo_id}.pdf`;
+
+                                    // Agregar y hacer clic en el enlace
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+
+
+
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    toastr.error('¡Se produjo el error! ' + textStatus,
+                                        'Intenta mas tarde');
+
+                                }
+                            });
+                        }
 
                     }
 

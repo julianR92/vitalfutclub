@@ -3,14 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Torneo;
-use App\Models\TorneoJugador;
 use App\Models\Persona;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\Notificaciones;
 use App\Models\Sede;
 use App\Models\Sorteo;
 use App\Models\SorteoEquipo;
@@ -251,7 +246,7 @@ class SorteoController extends Controller
         DB::beginTransaction();
 
         try {
-           $equipos = $request->equipos;
+            $equipos = $request->equipos;
             foreach ($equipos as $equipo) {
                 $equipo_id = $equipo['equipo_id'];
 
@@ -300,8 +295,8 @@ class SorteoController extends Controller
         // Contar cuántos jugadores hay en cada clasificación
         $conteo = $jugadores->countBy();
 
-        // Validar que las clasificaciones 1, 2, 4 y 5 sean múltiplos de `num_equipos`
-        $clasificaciones_restringidas = [1, 2, 4, 5];
+        // Validar que las clasificaciones 1, 2, 4 y 5 y 6 sean múltiplos de `num_equipos`
+        $clasificaciones_restringidas = [1, 2, 4, 5, 6];
         $errores = [];
 
         foreach ($clasificaciones_restringidas as $clasificacion) {
@@ -369,7 +364,7 @@ class SorteoController extends Controller
             }
 
             // 1️⃣ **Distribuir clasificaciones 1, 2, 4, 5 equitativamente**
-            $clasificacionesFijas = [1, 2, 4, 5];
+            $clasificacionesFijas = [1, 2, 4, 5, 6];
 
             foreach ($clasificacionesFijas as $clasificacion) {
                 if (!isset($jugadoresPorClasificacion[$clasificacion])) {
@@ -436,6 +431,53 @@ class SorteoController extends Controller
                     $sobrantes--; // Disminuir el número de sobrantes
                 }
             }
+            //repartir juagores de clasificacion 7
+            if (isset($jugadoresPorClasificacion[7])) {
+                shuffle($jugadoresPorClasificacion[7]); // Mezclar arqueros
+
+                $equipoKeys = array_keys($equiposDistribuidos);
+                shuffle($equipoKeys); // Evitar sesgo
+
+                // Inicializar contadores
+                $arquerosPorEquipo = array_fill_keys($equipoKeys, 0);
+                $jugadoresTotalesPorEquipo = [];
+
+                foreach ($equiposDistribuidos as $id => $equipo) {
+                    $jugadoresTotalesPorEquipo[$id] = count($equipo['jugadores']);
+                }
+
+                foreach ($jugadoresPorClasificacion[7] as $arquero) {
+                    // Filtrar equipos que aún no tengan arquero
+                    $equiposDisponibles = array_filter($equipoKeys, function ($id) use ($arquerosPorEquipo) {
+                        return $arquerosPorEquipo[$id] < 1;
+                    });
+
+                    if (empty($equiposDisponibles)) {
+                        break; // Ya no hay equipos disponibles sin arquero
+                    }
+
+                    // Ordenar por menos jugadores totales
+                    usort($equiposDisponibles, function ($a, $b) use ($jugadoresTotalesPorEquipo) {
+                        return $jugadoresTotalesPorEquipo[$a] <=> $jugadoresTotalesPorEquipo[$b];
+                    });
+
+                    $equipoElegido = $equiposDisponibles[0];
+
+                    // Asignar arquero
+                    $equiposDistribuidos[$equipoElegido]['jugadores'][] = [
+                        'jugador_id' => $arquero->jugador_id,
+                        'nombre' => $arquero->nombres . ' ' . $arquero->apellidos,
+                        'clasificacion' => 7
+                    ];
+
+                    // Actualizar contadores
+                    $arquerosPorEquipo[$equipoElegido]++;
+                    $jugadoresTotalesPorEquipo[$equipoElegido]++;
+                }
+            }
+
+
+
             DB::commit();
             return response()->json(['success' => true, 'message' => "Equipos Sorteados exitosamente", 'equipos' => $equiposDistribuidos]);
         } catch (\Illuminate\Database\QueryException $e) {
@@ -448,14 +490,81 @@ class SorteoController extends Controller
 
     public function downloadSorteo(Request $request)
     {
-        $datos = SorteoEquipo::where('sorteo_id', $request->id)->with(['sorteo.sede','jugadores.jugador'])->get();
+        $datos = SorteoEquipo::where('sorteo_id', $request->id)->with(['sorteo.sede', 'jugadores.jugador'])->get();
         $equipos = $request->equipos;
         $pdf = PDF::loadView('exports.sorteo-pdf', compact('datos', 'equipos'))->setPaper('letter', 'portrait');
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="Sorteo-Vitalfut-' . $request->id . '.pdf"',
         ]);
+    }
+
+    public function updateTeam(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sorteo_id' => 'required',
+            'jugador_id'  => 'required',
+            'equipo_id'  => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()->all()]);
+        }
+        DB::beginTransaction();
+
+        try {
+
+            DB::table('sorteo_jugadores')->insert([
+                'sorteo_id' => $request->sorteo_id,
+                'jugador_id' => $request->jugador_id,
+                'clasificacion' => 3,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            DB::table('sorteo_equipo_jugador')->insert([
+                'equipo_id' => $request->equipo_id,
+                'jugador_id' => $request->jugador_id,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
 
 
+            DB::commit();
+            return response()->json(['success' => true, 'message' => "Jugador Insertado Correctamente"]);
+            // all good
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'errors' => [$e->getMessage()]]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'errors' => [$e->getMessage()]]);
+        }
+    }
+
+    public function downloadSorteoFinal(Request $request)
+    {
+        $datos = SorteoEquipo::where('sorteo_id', $request->id)->with(['sorteo.sede', 'jugadores.jugador'])->get();
+        $equipos = [];
+        foreach ($datos as $equipo) {
+            $equipos[$equipo->id] = [
+                'id' => $equipo->id,
+                'nombre_equipo' => $equipo->nombre_equipo,
+                'jugadores' => []
+            ];
+            foreach ($equipo['jugadores'] as $jugador) {
+                $equipos[$equipo->id]['jugadores'][] = [
+                    "jugador_id" => $jugador['jugador']['id'],
+                    "nombre" => $jugador['jugador']['nombres'] . " " . $jugador['jugador']['apellidos'],
+                    'puntaje'=> 0
+                ];
+            }
+        }
+
+        $pdf = PDF::loadView('exports.sorteo-pdf', compact('datos', 'equipos'))->setPaper('letter', 'portrait');
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="Sorteo-Vitalfut-' . $request->id . '.pdf"',
+        ]);
     }
 }
