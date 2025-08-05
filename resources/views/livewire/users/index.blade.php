@@ -47,6 +47,7 @@
             transform: scale(1.0);
             transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
         }
+
         /* MODAL 2 */
         .modal2 {
             position: fixed;
@@ -112,7 +113,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
 
@@ -151,7 +152,7 @@
         <div class="modal-content">
             <span class="close-button">×</span>
 
-            <form class="w-full max-w-full p-2" id="myForm">
+            <form class="w-full max-w-full p-2" id="myForm" enctype="multipart/form-data">
 
                 <div class="text-center sm:text-left">
                     <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">
@@ -232,9 +233,19 @@
                         <x-jet-input-error for="direccion" class="mt-2" />
                     </div>
                 </div>
+                <div class="flex flex-wrap mt-3">
+                    <div class="w-full md:w-3/3 px-1 mb-2 md:mb-0">
+                        <x-jet-label for="photo" value="Foto de perfil (png, jpg, jpeg)" />
+                        <input type="file" id="photo" placeholder="photo"
+                            name="photo"
+                            class="w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+                            accept=".jpg,.jpeg,.png" />
+                        <x-jet-input-error for="photo" class="mt-2" />
+                    </div>
+                </div>
 
                 <div class="flex md:justify-end xl:justify-end justify-center mt-3">
-                    <input type="hidden" id="id" name="id"/>
+                    <input type="hidden" id="id" name="id" />
                     <x-jet-button class="bg-green-600 hover:bg-green-700 text-white hover:text-white mr-2">
                         Guardar
                     </x-jet-button>
@@ -269,22 +280,23 @@
                             class="w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                             name="sede_id" id="sede_id" multiple>
                             @foreach ($sedes as $item)
-                                <option value="{{$item->id}}">{{$item->nombre_sede}} | {{$item->direccion}}</option>
+                                <option value="{{ $item->id }}">{{ $item->nombre_sede }} | {{ $item->direccion }}
+                                </option>
                             @endforeach
-                          
+
                         </select>
                         <x-jet-input-error for="sede_id" class="mt-2" />
                     </div>
-                   
+
                 </div>
 
-              
 
-               
+
+
 
 
                 <div class="flex md:justify-end xl:justify-end justify-center mt-3">
-                    <input type="hidden" id="user_id" name="user_id"/>
+                    <input type="hidden" id="user_id" name="user_id" />
                     <x-jet-button class="bg-green-600 hover:bg-green-700 text-white hover:text-white mr-2">
                         Guardar
                     </x-jet-button>
@@ -334,11 +346,11 @@
             function cerrar() {
                 toggleModal();
             }
-        // MODAL-2
+            // MODAL-2
             var modal2 = document.querySelector(".modal2");
             var closeButton2 = document.querySelector(".close-button2");
 
-            function toggleModal2() {            
+            function toggleModal2() {
                 modal2.classList.toggle("show-modal2");
             }
 
@@ -350,20 +362,21 @@
 
             closeButton2.addEventListener("click", toggleModal2);
             window.addEventListener("click", windowOnClick2);
-            
+
             function cerrar() {
                 toggleModal();
             }
+
             function cerrar2() {
                 toggleModal2();
             }
 
             $(document).ready(function() {
-                  
-        $('#sede_id').select2({
-            placeholder: "Selecciona una o más opciones",
-            allowClear: true
-        })
+
+                $('#sede_id').select2({
+                    placeholder: "Selecciona una o más opciones",
+                    allowClear: true
+                })
 
                 var rol = "{{ Auth::user()->rol }}";
                 $('#tabla').DataTable({
@@ -417,7 +430,7 @@
                             orderable: false,
                             render: function(data, type, row) {
                                 let html = `<ul>`
-                                row.sedes.forEach(el=>{
+                                row.sedes.forEach(el => {
                                     html += `<li>${el.nombre_sede}</li>`
                                 })
                                 html += `</ul>`
@@ -439,19 +452,19 @@
                 				<svg data-id="${row.id}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g data-id="${row.id}" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path  data-id="${row.id}" d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0M3 9h3v6H3zm15 0h3v6h-3z"/><path data-id="${row.id}" d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm9-2v14"/></g></svg>
                 			</button>
                 			${rol === 'admin' ? `
-                           <button data-id="${row.id}" data-persona="${row.persona_id}" class="w-4 mx-2 transform hover:text-blue-800 hover:scale-125 btnEditar">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="btnEditar" data-id="${row.id}" data-persona="${row.persona_id}">
-                    <path data-id="${row.id}" data-persona="${row.persona_id}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                        </button>
-                        <button data-id="${row.id}" class="w-4 mx-2 transform hover:text-blue-800 hover:scale-125 btnEliminar">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="btnEliminar" data-id="${row.id}" >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"  data-id="${row.id}"/>
-                            </svg>
-                            </button>
-                                                                                			` : ''}
+                                           <button data-id="${row.id}" data-persona="${row.persona_id}" class="w-4 mx-2 transform hover:text-blue-800 hover:scale-125 btnEditar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="btnEditar" data-id="${row.id}" data-persona="${row.persona_id}">
+                                    <path data-id="${row.id}" data-persona="${row.persona_id}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                        </button>
+                                        <button data-id="${row.id}" class="w-4 mx-2 transform hover:text-blue-800 hover:scale-125 btnEliminar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="btnEliminar" data-id="${row.id}" >
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"  data-id="${row.id}"/>
+                                            </svg>
+                                            </button>
+                                                                                                			` : ''}
                 		</div>
                 		`;
                             }
@@ -490,7 +503,7 @@
 
                 });
 
-                //form 
+                //form
 
                 $('#myForm').validate({
                     rules: {
@@ -526,6 +539,10 @@
                         },
                         direccion: {
                             required: true
+                        },
+                        profile_photo_path: {
+                            required: false,
+                            extension: "jpg|jpeg|png"
                         }
                     },
                     messages: {
@@ -561,6 +578,9 @@
                         },
                         direccion: {
                             required: "Campo Requerido"
+                        },
+                        profile_photo_path: {
+                            extension: "Solo se permiten imágenes JPG, JPEG o PNG."
                         }
                     },
                     submitHandler: function(form) {
@@ -575,27 +595,28 @@
                             contentType: false,
                             processData: false,
                             success: function(response) {
-                             if (response.success){
+                                if (response.success) {
                                     toggleModal();
                                     Swal.fire({
-                                    title: response.message,
-                                    text: response.addMessage,
-                                    icon: "success"
+                                        title: response.message,
+                                        text: response.addMessage,
+                                        icon: "success"
                                     });
 
                                     setTimeout(() => {
-                            location.reload();
-                        }, 2500)
+                                        location.reload();
+                                    }, 2500)
 
-                                }  else {
+                                } else {
                                     response.errors.forEach((el) => {
-                                        toastr.error(el ,'Atencion');
+                                        toastr.error(el, 'Atencion');
 
                                     })
                                 }
                             },
                             error: function(xhr, status, error) {
-                                toastr.error('¡Se produjo el error!' + error, 'Intenta mas tarde');
+                                toastr.error('¡Se produjo el error!' + error,
+                                    'Intenta mas tarde');
 
                             }
                         });
@@ -605,83 +626,84 @@
                 //form sedes
 
                 $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-           });
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
 
-            $('#myFormSedes').submit(function(event) {
-                event.preventDefault(); // Evitar el envío tradicional del formulario
+                $('#myFormSedes').submit(function(event) {
+                    event.preventDefault(); // Evitar el envío tradicional del formulario
 
-                const sedesSeleccionadas = $('#sede_id').val()|| [];
-                let user_id = document.getElementById('user_id').value
-                $.ajax({
-                    url: '/sedes/users', // Reemplaza con tu URL de destino
-                    type: 'POST',
-                    data: {
-                        sedes: sedesSeleccionadas,
-                        user_id: user_id
-                    },
-                    success: function(response) {
-                        if (response.success){
-                                    toggleModal2();
-                                    Swal.fire({
+                    const sedesSeleccionadas = $('#sede_id').val() || [];
+                    let user_id = document.getElementById('user_id').value
+                    $.ajax({
+                        url: '/sedes/users', // Reemplaza con tu URL de destino
+                        type: 'POST',
+                        data: {
+                            sedes: sedesSeleccionadas,
+                            user_id: user_id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                toggleModal2();
+                                Swal.fire({
                                     title: response.message,
                                     text: 'Operación Exitosa',
                                     icon: "success"
-                                    });
+                                });
 
-                                    setTimeout(() => {
-                            location.reload();
-                        }, 2500)
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 2500)
 
-                                }  else {
-                                    response.errors.forEach((el) => {
-                                        toastr.error(el ,'Atencion');
+                            } else {
+                                response.errors.forEach((el) => {
+                                    toastr.error(el, 'Atencion');
 
-                                    })
-                                }
-                       
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error('¡Se produjo el error!' + error, 'Intenta mas tarde');
+                                })
+                            }
 
-                    }
-                });
-            })
+                        },
+                        error: function(xhr, status, error) {
+                            toastr.error('¡Se produjo el error!' + error, 'Intenta mas tarde');
+
+                        }
+                    });
+                })
 
 
 
             });
 
-         
+
 
             document.addEventListener('click', (e) => {
-                if (e.target.matches('.btnEditar')|| e.target.closest('.btnEditar')) {
-                    let persona_id =e.target.dataset.persona
-                    let user_id =e.target.dataset.id
+                if (e.target.matches('.btnEditar') || e.target.closest('.btnEditar')) {
+                    let persona_id = e.target.dataset.persona
+                    let user_id = e.target.dataset.id
                     $.ajax({
-                    url: `/users/edit/${persona_id}`,
-                    type: 'GET',
-                    success: function(response) {                        
-                    document.getElementById('modal-title').textContent = 'Editar Profe';
-                    document.getElementById('tipo_doc').value = response.data.tipo_doc;
-                    document.getElementById('documento').value = response.data.documento;
-                    document.getElementById('nombres').value = response.data.nombres;
-                    document.getElementById('apellidos').value = response.data.apellidos;
-                    document.getElementById('fecha_nacimiento').value = response.data.fecha_nacimiento;
-                    document.getElementById('telefono').value = response.data.telefono;
-                    document.getElementById('correo').value = response.data.correo;
-                    document.getElementById('direccion').value = response.data.direccion;
-                    document.getElementById('id').value = response.data.id;
-                    modal.classList.toggle("show-modal");
+                        url: `/users/edit/${persona_id}`,
+                        type: 'GET',
+                        success: function(response) {
+                            document.getElementById('modal-title').textContent = 'Editar Profe';
+                            document.getElementById('tipo_doc').value = response.data.tipo_doc;
+                            document.getElementById('documento').value = response.data.documento;
+                            document.getElementById('nombres').value = response.data.nombres;
+                            document.getElementById('apellidos').value = response.data.apellidos;
+                            document.getElementById('fecha_nacimiento').value = response.data
+                                .fecha_nacimiento;
+                            document.getElementById('telefono').value = response.data.telefono;
+                            document.getElementById('correo').value = response.data.correo;
+                            document.getElementById('direccion').value = response.data.direccion;
+                            document.getElementById('id').value = response.data.id;
+                            modal.classList.toggle("show-modal");
 
-                  },
-                     error: function(jqXHR, textStatus, errorThrown) {
-                     toastr.error('¡Se produjo el error!' + errorThrown, 'Intenta mas tarde');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            toastr.error('¡Se produjo el error!' + errorThrown, 'Intenta mas tarde');
 
-            }
-        });
+                        }
+                    });
                     // Livewire.emitTo('persona.modal', 'abrirModal', e.target.dataset.id);
                 }
 
@@ -699,26 +721,27 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                    url: `/users/delete/${user_id}`,
-                    type: 'GET',
-                    success: function(response) {  
-                         Swal.fire(
-                                'Usuario desactivado!',
-                                'Este usuario ya no podrá volver a ingresar.',
-                                'success',
-                            )
-                            setTimeout(() => {
-                            location.reload();
-                        }, 2500)
+                                url: `/users/delete/${user_id}`,
+                                type: 'GET',
+                                success: function(response) {
+                                    Swal.fire(
+                                        'Usuario desactivado!',
+                                        'Este usuario ya no podrá volver a ingresar.',
+                                        'success',
+                                    )
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 2500)
 
-                       },
-                     error: function(jqXHR, textStatus, errorThrown) {
-                     toastr.error('¡Se produjo el error!' + error, 'Intenta mas tarde');
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    toastr.error('¡Se produjo el error!' + error,
+                                        'Intenta mas tarde');
 
-                  }
-                });
+                                }
+                            });
 
-                           
+
                         }
                     })
 
@@ -726,25 +749,25 @@
                 if (e.target.matches('.btnCancha') || e.target.closest('.btnCancha')) {
                     let user_id = e.target.dataset.id;
                     $.ajax({
-                    url: `/users/getSedes/${user_id}`,
-                    type: 'GET',
-                    success: function(response) {
-                        $('#sede_id').val('').trigger('change');
-                        if(response.data.sedes.length>0){
-                            const sedesSeleccionadas = response.data.sedes.map(sede => sede.id);
-                            $('#sede_id').val(sedesSeleccionadas).trigger('change');
+                        url: `/users/getSedes/${user_id}`,
+                        type: 'GET',
+                        success: function(response) {
+                            $('#sede_id').val('').trigger('change');
+                            if (response.data.sedes.length > 0) {
+                                const sedesSeleccionadas = response.data.sedes.map(sede => sede.id);
+                                $('#sede_id').val(sedesSeleccionadas).trigger('change');
+                            }
+                            document.getElementById('profesor_name').textContent = response.data.user.name
+                            document.getElementById('user_id').value = response.data.user.id
+                            toggleModal2();
+
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            toastr.error('¡Se produjo el error!' + errorThrown, 'Intenta mas tarde');
+
                         }
-                        document.getElementById('profesor_name').textContent= response.data.user.name
-                        document.getElementById('user_id').value= response.data.user.id
-                        toggleModal2();                         
+                    });
 
-                       },
-                     error: function(jqXHR, textStatus, errorThrown) {
-                     toastr.error('¡Se produjo el error!' + errorThrown, 'Intenta mas tarde');
-
-                  }
-                });
-                   
                 }
 
             });
