@@ -149,7 +149,7 @@ class UserController extends Controller
                     $fotoName = $uuid . '.' . $extension;
                     $fotoPath = $foto->storeAs('fotos', $fotoName, 'public');
                 }
-                $fotoUrl = $fotoPath ? asset('storage/' . $fotoPath) : null;
+                $fotoUrl = $fotoPath ? config('app.url').'storage/public/fotos/' . $fotoName . '': null;
 
                 $persona_id =  DB::table('personas')->where('id', $request->id)->update([
                     'tipo_doc' => $request->tipo_doc,
@@ -233,11 +233,21 @@ class UserController extends Controller
     public function getStaff()
     {
 
-        $profes = User::select('id', 'profile_photo_path', 'name')
+        $domain = config('app.url');
+
+            $profeSergio = (object) [
+                'id' => 1,
+                'name' => 'Sergio Andres Becerra',
+                'profile_photo_path' => $domain . '/assets/img/vitalfut/profe-sergio.jpg'
+            ];
+
+        $otrosProfesores  = User::select('id', 'profile_photo_path', 'name')
             ->where('rol', 'profesor')
             ->orderBy('name', 'asc')
             ->where('estado', 1)
             ->get();
+
+        $profes = collect([$profeSergio])->merge($otrosProfesores);
 
         return response()->json(['members' => $profes]);
     }
