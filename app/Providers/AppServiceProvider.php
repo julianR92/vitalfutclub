@@ -23,8 +23,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-     $this->app->bind('path.public', function() {
-        return base_path().'/../vitalfutclub.com';
-    });
+        // Para producción con estructura separada
+        if (file_exists(base_path().'/../vitaladmin')) {
+            $this->app->bind('path.public', function() {
+                return base_path().'/../vitaladmin';
+            });
+        }
     }
 }

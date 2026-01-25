@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class User extends Authenticatable
 {
@@ -17,6 +19,12 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+
+     // Constantes para roles
+    const ROL_ADMIN = 'admin';
+    const ROL_PROFESOR = 'profesor';
+    const ROL_RECEPCION = 'recepcion';
+    const ROL_CLIENTE = 'cliente';
 
     /**
      * The attributes that are mass assignable.
@@ -66,11 +74,73 @@ class User extends Authenticatable
     public function people(){
         return $this->belongsTo(Persona::class, 'persona_id');
     }
-    
+
      public function sedes()
      {
          return $this->belongsToMany(Sede::class, 'sede_user', 'user_id', 'sede_id');
      }
- 
-     //  lo nuevo 30-09-24
+
+      /**
+     * Relación: Un profesor tiene muchas sedes a cargo
+     */
+    public function canchas(): HasMany
+    {
+        return $this->hasMany(Sede::class, 'user_id');
+    }
+
+      /**
+     * Scope: Filtrar por rol
+     */
+    public function scopeConRol($query, string $rol)
+    {
+        return $query->where('rol', $rol);
+    }
+
+    /**
+     * Scope: Solo profesores
+     */
+    public function scopeProfesores($query)
+    {
+        return $query->where('rol', self::ROL_PROFESOR);
+    }
+
+    /**
+     * Scope: Solo usuarios activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('estado', 1);
+    }
+
+    /**
+     * Verificar si el usuario es profesor
+     */
+    public function isProfesor(): bool
+    {
+        return $this->rol === self::ROL_PROFESOR;
+    }
+
+    /**
+     * Verificar si el usuario es admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->rol === self::ROL_ADMIN;
+    }
+
+    /**
+     * Verificar si el usuario tiene sedes asignadas
+     */
+    public function tieneSedes(): bool
+    {
+        return $this->sedes()->exists();
+    }
+
+    /**
+     * Obtener número de sedes a cargo
+     */
+    public function getNumeroSedesAttribute(): int
+    {
+        return $this->sedes()->count();
+    }
 }

@@ -100,6 +100,46 @@
                     </div>
 
                     @if (Auth::user()->rol == 'admin')
+                        <!-- Congelación de Planes -->
+                        <div
+                            class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-orange-300 hover:-translate-y-2 cursor-pointer">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-orange-400/10 via-orange-300/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="absolute -top-10 -right-10 w-32 h-32 bg-orange-100 rounded-full blur-2xl opacity-0 group-hover:opacity-50 transition-all duration-500">
+                            </div>
+
+                            <div class="relative p-6 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div
+                                        class="w-16 h-16 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-orange-400/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                                        <i class="fa-solid fa fa-building text-white text-2xl"></i>
+                                    </div>
+                                    <span
+                                        class="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-bold rounded-full group-hover:bg-orange-200 transition-colors duration-300">Ciudades</span>
+                                </div>
+
+                                <h3
+                                    class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors duration-300 min-h-[56px]">
+                                    Ciudades
+                                </h3>
+
+                                <p class="text-gray-600 text-sm leading-relaxed min-h-[60px]">
+                                    Gestiona las ciudades donde VitalFut tiene presencia.
+                                </p>
+
+                                <a href="/ciudades"
+                                    class="inline-flex items-center space-x-2 text-orange-600 font-semibold text-sm group-hover:text-orange-700 transition-colors duration-300">
+                                    <span>Acceder</span>
+                                    <i
+                                        class="fa-solid fa-arrow-right text-sm group-hover:translate-x-2 transition-transform duration-300"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (Auth::user()->rol == 'admin')
                         <!-- Administración de Sedes -->
                         <div
                             class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-orange-300 hover:-translate-y-2 cursor-pointer">
@@ -167,7 +207,7 @@
                                     Gestiona todos los planes y servicios que VitalFut ofrece a sus clientes.
                                 </p>
 
-                                <a href="{{ route('plan.index') }}"
+                                <a href="/planes"
                                     class="inline-flex items-center space-x-2 text-orange-600 font-semibold text-sm group-hover:text-orange-700 transition-colors duration-300">
                                     <span>Acceder</span>
                                     <i
@@ -256,45 +296,7 @@
                     </div>
                 @endif
 
-                @if (Auth::user()->rol == 'admin' || Auth::user()->rol == 'profesor')
-                    <!-- Administración de Torneos -->
-                    <div
-                        class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-orange-300 hover:-translate-y-2 cursor-pointer">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-orange-400/10 via-orange-300/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        </div>
-                        <div
-                            class="absolute -top-10 -right-10 w-32 h-32 bg-orange-100 rounded-full blur-2xl opacity-0 group-hover:opacity-50 transition-all duration-500">
-                        </div>
 
-                        <div class="relative p-6 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div
-                                    class="w-16 h-16 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-orange-400/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                                    <i class="fa-solid fa-trophy text-white text-2xl"></i>
-                                </div>
-                                <span
-                                    class="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-bold rounded-full group-hover:bg-orange-200 transition-colors duration-300">Torneos</span>
-                            </div>
-
-                            <h3
-                                class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors duration-300 min-h-[56px]">
-                                Administración de Torneos
-                            </h3>
-
-                            <p class="text-gray-600 text-sm leading-relaxed min-h-[60px]">
-                                Crea y gestiona jugadores para los torneos internos VitalFut.
-                            </p>
-
-                            <a href="{{ route('torneo.index') }}"
-                                class="inline-flex items-center space-x-2 text-orange-600 font-semibold text-sm group-hover:text-orange-700 transition-colors duration-300">
-                                <span>Acceder</span>
-                                <i
-                                    class="fa-solid fa-arrow-right text-sm group-hover:translate-x-2 transition-transform duration-300"></i>
-                            </a>
-                        </div>
-                    </div>
-                @endif
 
                 @if (Auth::user()->rol == 'admin')
                     <!-- Congelación de Planes -->
@@ -375,6 +377,48 @@
                         </div>
                     </div>
                 @endif
+
+                 @if (Auth::user()->rol == 'admin' || Auth::user()->rol == 'profesor')
+                    <!-- Administración de Torneos -->
+                    <div
+                        class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-orange-300 hover:-translate-y-2 cursor-pointer">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-orange-400/10 via-orange-300/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        </div>
+                        <div
+                            class="absolute -top-10 -right-10 w-32 h-32 bg-orange-100 rounded-full blur-2xl opacity-0 group-hover:opacity-50 transition-all duration-500">
+                        </div>
+
+                        <div class="relative p-6 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div
+                                    class="w-16 h-16 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-orange-400/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                                    <i class="fa-solid fa-trophy text-white text-2xl"></i>
+                                </div>
+                                <span
+                                    class="px-3 py-1 bg-orange-100 text-orange-600 text-xs font-bold rounded-full group-hover:bg-orange-200 transition-colors duration-300">Torneos</span>
+                            </div>
+
+                            <h3
+                                class="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors duration-300 min-h-[56px]">
+                                Administración de Torneos
+                            </h3>
+
+                            <p class="text-gray-600 text-sm leading-relaxed min-h-[60px]">
+                                Crea y gestiona jugadores para los torneos internos VitalFut.
+                            </p>
+
+                            <a href="{{ route('torneo.index') }}"
+                                class="inline-flex items-center space-x-2 text-orange-600 font-semibold text-sm group-hover:text-orange-700 transition-colors duration-300">
+                                <span>Acceder</span>
+                                <i
+                                    class="fa-solid fa-arrow-right text-sm group-hover:translate-x-2 transition-transform duration-300"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
+
 
             </div>
         </div>

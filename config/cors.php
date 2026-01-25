@@ -19,8 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:4200'],
-
+    'allowed_origins' => [
+        'http://localhost:4200',
+        'https://vitalfutclub.com',
+        'http://localhost:8100',
+    ],
 
     'allowed_origins_patterns' => [],
 

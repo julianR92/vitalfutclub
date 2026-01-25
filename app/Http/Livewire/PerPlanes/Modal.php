@@ -27,25 +27,27 @@ class Modal extends Component
 
     protected $listeners = [
         'abrirModal',
-        
+
     ];
 
     protected function rules()
     {
         return [
-            'plan_id' => 'required',            
+            'plan_id' => 'required',
             'fecha_inicio' => 'required|date',
             'cantidad_plan' => 'required|numeric|min:1|max:50',
             'sede_id'=>'required'
-            
+
         ];
     }
 
-    
+
 
     public function render()
     {
-        return view('livewire.per-planes.modal',['planes' => Plan::all(),'sedes'=>Sede::all()]);
+        return view('livewire.per-planes.modal',[
+            'planes' => Plan::where('tipo_plan', 'prepago')->get(),
+            'sedes'=>Sede::all()]);
     }
 
     public function abrirModal(Persona $persona){
@@ -56,9 +58,9 @@ class Modal extends Component
     }
 
     public function cerrarModal()
-    {   
-        
-        
+    {
+
+
         $this->resetExcept('persona');
         $this->resetErrorBag();
         $this->resetValidation();
@@ -71,7 +73,7 @@ class Modal extends Component
         $plan = Plan::findOrFail($this->plan_id);
         $calculo_dias = $this->cantidad_plan * $plan->numero_dias;
         $calculo_clases = $this->cantidad_plan * $plan->numero_clases;
-        $total_plan = $this->cantidad_plan * $plan->valor;
+        $total_plan = $this->cantidad_plan * $plan->precio_final;
         $fecha_fin = date("Y-m-d", strtotime($this->fecha_inicio . "+".$calculo_dias." day"));
 
         $planes = new PerPLanes;
@@ -87,11 +89,11 @@ class Modal extends Component
         $planes->observacion = 'Asignacion Inicial';
         $planes->save();
         $id = $planes->id;
-        
+
         //generate pdf
         $empresa = Empresa::all();
-        $plan_activo = PerPlanes::join('planes', 'planes.id', '=', 'per_planes.plan_id')->join('personas', 'personas.id', '=', 'per_planes.persona_id')->leftJoin('sedes','sedes.id', '=', 'per_planes.sede_id')->where('per_planes.persona_id', $this->persona->id)->where('per_planes.estado', 1)->get();       
-        $hoy = date("Y-m-d");	     
+        $plan_activo = PerPlanes::join('planes', 'planes.id', '=', 'per_planes.plan_id')->join('personas', 'personas.id', '=', 'per_planes.persona_id')->leftJoin('sedes','sedes.id', '=', 'per_planes.sede_id')->where('per_planes.persona_id', $this->persona->id)->where('per_planes.estado', 1)->get();
+        $hoy = date("Y-m-d");
         $pdf = PDF::loadView('factura.factura', compact('empresa','plan_activo', 'hoy', 'id'));
         Storage::disk('public')->put('facturas/'.$plan_activo[0]->documento.'/Factura-de-venta-'.$planes->id.'.pdf', $pdf->output());
 
@@ -104,12 +106,12 @@ class Modal extends Component
 
         //send Mail
         $detalleCorreo = [
-            'nombres' => $plan_activo[0]->nombres . ' ' . $plan_activo[0]->apellidos, 
-            'documento'=> $plan_activo[0]->documento, 
-            'sede'=> $plan_activo[0]->nombre_sede,    
-            'plan'=> $plan_activo[0]->nombre_plan, 
+            'nombres' => $plan_activo[0]->nombres . ' ' . $plan_activo[0]->apellidos,
+            'documento'=> $plan_activo[0]->documento,
+            'sede'=> $plan_activo[0]->nombre_sede,
+            'plan'=> $plan_activo[0]->nombre_plan,
             'Subject' => 'Facturacion VitalFut N°-'.$id,
-            'adjunto' => 'SI',           
+            'adjunto' => 'SI',
             'numero_factura'=> $id,
             'mensaje'=>null,
 
@@ -120,10 +122,10 @@ class Modal extends Component
 
         $this->emit('alert', ['title' => 'Proceso exitoso!', 'text' => 'Plan Asignado Exitosamente','icon'=>'success']);
         $this->cerrarModal();
-        $this->redirectRoute('persona.detalle', ['persona'=>$this->persona->id]);  
+        $this->redirectRoute('persona.detalle', ['persona'=>$this->persona->id]);
 
-              
-        
+
+
     }
 
     public function updated($campo)

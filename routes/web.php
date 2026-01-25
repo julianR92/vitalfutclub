@@ -48,15 +48,15 @@ Route::middleware(['auth:sanctum', 'verified'])
 	->name('persona.detalle')
 	->middleware(['auth:sanctum', 'verified']);
 
-Route::middleware(['auth:sanctum', 'verified'])
-	->get('/plan/index', Plan::class)
-	->name('plan.index')
-	->middleware(['auth:sanctum', 'verified']);
+// Route::middleware(['auth:sanctum', 'verified'])
+// 	->get('/plan/index', Plan::class)
+// 	->name('plan.index')
+// 	->middleware(['auth:sanctum', 'verified']);
 
-Route::middleware(['auth:sanctum', 'verified'])
-	->get('/sedes/index', Sede::class)
-	->name('sedes.index')
-	->middleware(['auth:sanctum', 'verified']);
+// Route::middleware(['auth:sanctum', 'verified'])
+// 	->get('/sedes/index', Sede::class)
+// 	->name('sedes.index')
+// 	->middleware(['auth:sanctum', 'verified']);
 
 Route::middleware(['auth:sanctum', 'verified'])
 	->get('/empresa/index', Empresa::class)
@@ -80,6 +80,39 @@ Route::middleware(['auth:sanctum', 'verified'])
 
 
 Route::get('/persona/getData', [App\Http\Controllers\PersonaController::class, 'getData'])->middleware(['auth:sanctum', 'verified']);
+
+// Rutas CRUD de Ciudades
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/ciudades/getData', [App\Http\Controllers\CiudadController::class, 'getData'])->name('ciudades.getData');
+    Route::resource('ciudades', App\Http\Controllers\CiudadController::class)->parameters([
+        'ciudades' => 'ciudad'
+    ]);
+});
+
+// Rutas CRUD de Sedes
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/sedes/getData', [App\Http\Controllers\SedeController::class, 'getData'])->name('sedes.getData');
+    Route::resource('sedes', App\Http\Controllers\SedeController::class)->parameters([
+        'sedes' => 'sede'
+    ]);
+});
+
+// Rutas CRUD de Planes
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/planes/getData', [App\Http\Controllers\PlanController::class, 'getData'])->name('planes.getData');
+    Route::post('/planes/{plan}/detalles', [App\Http\Controllers\PlanController::class, 'storeDetalle'])->name('planes.detalles.store');
+    Route::put('/planes/{plan}/detalles/{detalle}', [App\Http\Controllers\PlanController::class, 'updateDetalle'])->name('planes.detalles.update');
+    Route::delete('/planes/{plan}/detalles/{detalle}', [App\Http\Controllers\PlanController::class, 'destroyDetalle'])->name('planes.detalles.destroy');
+    Route::resource('planes', App\Http\Controllers\PlanController::class)->parameters([
+        'planes' => 'plan'
+    ]);
+
+    //ruta tablero
+    Route::get('/tablero', [App\Http\Controllers\TableroController::class, 'index'])->middleware(['auth:sanctum', 'verified'])->name('tablero.index');
+
+
+});
+
 Route::get('/index/user', [App\Http\Controllers\UserController::class, 'index'])->middleware(['auth:sanctum', 'verified'])->name('users.index');
 Route::get('/user/data', [App\Http\Controllers\UserController::class, 'getData'])->middleware(['auth:sanctum', 'verified'])->name('users.data');
 Route::post('/user/store', [App\Http\Controllers\UserController::class, 'store'])->middleware(['auth:sanctum', 'verified'])->name('users.store');

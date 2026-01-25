@@ -10,15 +10,28 @@
                     </div>
                 <div class="wrapper">
 
-                @foreach ($planes_sedes as $planes) 
+                @foreach ($planes_sedes as $planes)
                 <div class="card">
                     <h3 class="card-title">{{$planes->nombre_sede}}: {{$planes->numero_planes}}</h3>
                         <!--<p class="card-content">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.</p>-->
                         <!--<button class="card-btn">READ MORE</button>-->
                     </div>
                     @endforeach
-                
+
                   </div>
+                <div class="container px-6 py-4 mx-auto">
+                <div class="bg-slate-100/50 py-1 px-3 border-solid border-b rounded-lg">
+                    <x-titulo titulo="Tablero de analítica"></x-titulo>
+                </div>
+                <div class="mt-4 flex">
+                    <a href="{{ route('tablero.index') }}" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                        </svg>
+                        VER TABLERO
+                    </a>
+                </div>
+             </div>
                 <div class="container px-6 py-4 mx-auto">
                     <div class="bg-slate-100/50 py-1 px-3 border-solid border-b rounded-lg">
                         <x-titulo titulo="Reportes"></x-titulo>
@@ -180,18 +193,23 @@
                     </div>
                     <div class="col-md-12 text-right mt-3 {{$hidden}}">
                         <button onClick="exportar('xlsx','{{$reporte}}')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Exportar</button>
-                        
+
                     </div>
                 </div>
+
+
+
+
+
                  @livewire('reportes.reportes-sedes')
             </section>
         </div>
     </div>
 </div>
 <script>
-    
+
     function exportar(type,reporte,fn, dl) {
-        
+
        var elt = document.getElementById(reporte);
        console.log(elt);
        var wb = XLSX.utils.table_to_book(elt, { sheet: "reporte" });
@@ -199,5 +217,5 @@
          XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }):
          XLSX.writeFile(wb, fn || ('Reporte.' + (type || 'xlsx')));
     }
-    
+
 </script>

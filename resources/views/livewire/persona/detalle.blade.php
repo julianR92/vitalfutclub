@@ -118,7 +118,7 @@
                                                     {{$plan->cantidad_plan*$plan->numero_dias}}
                                                 </td>
                                                 <td class="border-grey-light border p-3" data-label="Valor">
-                                                    ${{$plan->cantidad_plan*$plan->valor }}
+                                                    ${{ number_format(($plan->cantidad_plan * $plan->valor) * (1 - $plan->descuento / 100),0, ',', '.') }}
                                                 </td>
                                                 <td class="border-grey-light border p-3" data-label="Sede">
                                                     {{ $plan->nombre_sede }}
@@ -157,7 +157,7 @@
                                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
                                                         </button>
-                                                        
+
                                                         @endif
                                                         @endif
                                                     </div>
@@ -209,12 +209,12 @@
               if(e.target.matches('.btnQR')){
                 Livewire.emit('downloadQr', e.target.dataset.id);
                 setTimeout(()=>{
-                   location.reload(); 
+                   location.reload();
                 },3000)
               }
              })
-             
-          
+
+
         </script>
     @endpush
 </div>

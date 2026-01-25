@@ -24,7 +24,7 @@ class Detalle extends Component
     public $cantidad_plan = 1;
     public $estado = 1;
     public $observacion = '';
-    
+
     protected $listeners = ['downloadQr' => 'downloadQr'];
 
 
@@ -56,7 +56,7 @@ class Detalle extends Component
          ->where('per_planes.persona_id', $this->persona->id)
          ->leftjoin('ingreso', 'ingreso.per_plan_id', '=', 'per_planes.id')
          ->leftjoin('sedes', 'sedes.id', '=', 'per_planes.sede_id')
-         ->select('per_planes.id as id_perplanes', 'planes.id as id_planes', 'planes.nombre_plan', 'planes.numero_clases', 'planes.numero_clases', 'planes.numero_dias', 'planes.valor', 'sedes.nombre_sede','per_planes.persona_id', 'per_planes.fecha_inicio', 'per_planes.fecha_fin', 'per_planes.numero_clase', 'per_planes.cantidad_plan', 'per_planes.total_plan', 'per_planes.estado','ingreso.per_plan_id as ingreso',DB::raw('count(ingreso.id) as count_ingreso'))->groupBy('per_planes.id', 'planes.id', 'planes.nombre_plan', 'planes.numero_clases', 'planes.numero_clases', 'planes.numero_dias', 'planes.valor', 'per_planes.persona_id', 'per_planes.fecha_inicio', 'per_planes.fecha_fin', 'per_planes.numero_clase', 'per_planes.cantidad_plan', 'per_planes.total_plan', 'per_planes.estado','ingreso.per_plan_id', 'sedes.nombre_sede')->orderBy('per_planes.id', 'desc')->get()]);
+         ->select('per_planes.id as id_perplanes', 'planes.id as id_planes', 'planes.nombre_plan', 'planes.numero_clases', 'planes.numero_clases', 'planes.numero_dias', 'planes.valor','planes.descuento', 'sedes.nombre_sede','per_planes.persona_id', 'per_planes.fecha_inicio', 'per_planes.fecha_fin', 'per_planes.numero_clase', 'per_planes.cantidad_plan', 'per_planes.total_plan', 'per_planes.estado','ingreso.per_plan_id as ingreso',DB::raw('count(ingreso.id) as count_ingreso'))->groupBy('per_planes.id', 'planes.id', 'planes.nombre_plan', 'planes.numero_clases', 'planes.numero_clases', 'planes.numero_dias', 'planes.valor', 'per_planes.persona_id', 'per_planes.fecha_inicio', 'per_planes.fecha_fin', 'per_planes.numero_clase', 'per_planes.cantidad_plan', 'per_planes.total_plan', 'per_planes.estado','ingreso.per_plan_id', 'sedes.nombre_sede')->orderBy('per_planes.id', 'desc')->get()]);
     }
 
     public function abrirModal(Persona $personas)
@@ -75,7 +75,7 @@ class Detalle extends Component
         // $this->estado = $personas->users->estado;
         $this->mostrarModal = '';
     }
-    
+
     public function downloadQr($id){
         $plan = Perplanes::select('per_planes.id', 'personas.nombres', 'personas.apellidos', 'personas.documento', 'per_planes.fecha_inicio', 'per_planes.fecha_fin')
                 ->join('personas', 'personas.id', '=', 'per_planes.persona_id')
@@ -86,8 +86,8 @@ class Detalle extends Component
             ];
         $nombres = $plan->nombres. ' '. $plan->apellidos;
         $encodedData = json_encode($data);
-        $qrCodeImage = QrCode::format('png')->size(300)->generate($encodedData);
-        $qrCodeDataUri = 'data:image/png;base64,' . base64_encode($qrCodeImage);
+        $qrCodeImage = QrCode::format('svg')->size(300)->generate($encodedData);
+        $qrCodeDataUri = 'data:image/svg+xml;base64,' . base64_encode($qrCodeImage);
         $pdfHtml = view('factura.qr-code', ['qrCodeDataUri' => $qrCodeDataUri, 'nombres'=>$nombres, 'documento'=>$plan->documento, 'plan'=>$plan])->render();
         $dompdf = \PDF::loadHTML($pdfHtml)->setPaper('a4');
         $dompdf->render();
@@ -96,8 +96,8 @@ class Detalle extends Component
         return response()->streamDownload(function () use ($dompdf) {
             echo $dompdf->output();
         }, $plan->documento.'-'.$id.'.pdf');
-        
-      
+
+
 
     }
 

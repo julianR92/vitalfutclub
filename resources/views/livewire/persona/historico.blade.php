@@ -89,7 +89,7 @@
                                     <th class="p-2">Número de clases</th>
                                     <th class="p-2">Clases registradas</th>
                                     <th class="p-2">Número de días</th>
-                                    <th class="p-2">Valor</th>
+                                    <th class="p-2">Valorsss</th>
                                     <th class="p-2">Sede</th>
                                     <th class="p-2">Factura</th>
                                 </tr>
@@ -118,10 +118,10 @@
                                         {{$plan->cantidad_plan*$plan->numero_dias}}
                                     </td>
                                     <td class="border-grey-light border p-3" data-label="Valor">
-                                        ${{$plan->cantidad_plan*$plan->valor }}
+                                        ${{$plan->cantidad_plan*$plan->precio_final }}
                                     </td>
                                     <td class="border-grey-light border p-3" data-label="Sede">
-                                        La Futbolera
+                                        {{ $plan->nombre_sede }}
                                     </td>
 
 
@@ -161,12 +161,12 @@
              }
 
             });
-            
+
               document.addEventListener('click', (e)=>{
               if(e.target.matches('.btnQR')){
                 Livewire.emit('downloadQr', e.target.dataset.id);
                 setTimeout(()=>{
-                   location.reload(); 
+                   location.reload();
                 },3000)
               }
              })
