@@ -34,6 +34,19 @@
                             <p class="font-medium text-sm text-gray-400">Teléfono</p>
                             <p class="text-sm">{{ $persona->telefono }}</p>
                         </div>
+                        <div class="w-full md:w-1/6 px-1 mb-2 md:mb-0">
+                            <p class="font-medium text-sm text-gray-400">Fecha de nacimiento</p>
+                            @if($persona->fecha_nacimiento)
+                                <p class="text-sm">{{ \Carbon\Carbon::parse($persona->fecha_nacimiento)->format('d/m/Y') }}</p>
+                                @if($this->cumpleaniosCerca)
+                                    <span class="inline-block mt-1 bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-xs font-medium">
+                                        🎂 {{ $this->mensajeCumpleanos }}
+                                    </span>
+                                @endif
+                            @else
+                                <p class="text-sm text-gray-400">No registrado</p>
+                            @endif
+                        </div>
                     </div>
                     <div class="md:flex xl:flex p-1 py-3 border-b border-gray-200">
                         <div class="w-full md:w-2/6 px-1 mb-2 md:mb-0">

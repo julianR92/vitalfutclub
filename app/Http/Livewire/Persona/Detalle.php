@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\PerPLanes;
 use Illuminate\Support\Facades\DB;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
 
 
 class Detalle extends Component
@@ -96,9 +97,62 @@ class Detalle extends Component
         return response()->streamDownload(function () use ($dompdf) {
             echo $dompdf->output();
         }, $plan->documento.'-'.$id.'.pdf');
+    }
 
+    /**
+     * Calcula los días faltantes para el próximo cumpleaños
+     *
+     * @return int|null Días faltantes o null si no hay fecha de nacimiento
+     */
+    public function getDiasFaltantesCumpleanos()
+    {
+        if (!$this->persona->fecha_nacimiento) {
+            return null;
+        }
 
+        $fechaNacimiento = Carbon::parse($this->persona->fecha_nacimiento);
+        $hoy = Carbon::now()->startOfDay();
 
+        $proximoCumple = $fechaNacimiento->copy()->year($hoy->year)->startOfDay();
+
+        if ($proximoCumple->lt($hoy)) {
+            $proximoCumple->addYear();
+        }
+
+        return $hoy->diffInDays($proximoCumple);
+    }
+
+    /**
+     * Verifica si el cumpleaños está cerca (5 días o menos)
+     *
+     * @return bool
+     */
+    public function getCumpleaniosCercaProperty()
+    {
+        $dias = $this->getDiasFaltantesCumpleanos();
+        return $dias !== null && $dias >= 0 && $dias <= 5;
+    }
+
+    /**
+     * Obtiene el mensaje del badge de cumpleaños
+     *
+     * @return string
+     */
+    public function getMensajeCumpleanosProperty()
+    {
+        $dias = $this->getDiasFaltantesCumpleanos();
+
+        if ($dias === null || $dias < 0 || $dias > 5) {
+            return '';
+        }
+
+        if ($dias == 0) {
+            return '¡Hoy cumple años! 🎉';
+        } elseif ($dias == 1) {
+            return 'Cumple mañana 🎂';
+        } else {
+            return "{$dias} días 🎈";
+        }
     }
 
 
