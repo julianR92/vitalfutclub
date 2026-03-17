@@ -118,6 +118,24 @@ Route::get('/user/data', [App\Http\Controllers\UserController::class, 'getData']
 Route::post('/user/store', [App\Http\Controllers\UserController::class, 'store'])->middleware(['auth:sanctum', 'verified'])->name('users.store');
 Route::get('/users/edit/{persona_id}', [App\Http\Controllers\UserController::class, 'edit'])->middleware(['auth:sanctum', 'verified'])->name('users.edit');
 Route::get('/users/delete/{user_id}', [App\Http\Controllers\UserController::class, 'delete'])->middleware(['auth:sanctum', 'verified'])->name('delete.edit');
+
+// ─── Módulo de Medidas Corporales ─────────────────────────────────────────────
+Route::prefix('medidas')->name('medidas.')->middleware(['auth:sanctum', 'verified'])->group(function () {
+    // Rutas estáticas primero (evitan conflicto con /{sesion})
+    Route::get('/', [App\Http\Controllers\MedidaController::class, 'seleccionarPersonas'])->name('seleccionar');
+    Route::post('/', [App\Http\Controllers\MedidaController::class, 'crearSesion'])->name('crear');
+    Route::get('/historial', [App\Http\Controllers\MedidaController::class, 'index'])->name('historial');
+    Route::get('/historial/getData', [App\Http\Controllers\MedidaController::class, 'getData'])->name('historial.getData');
+
+    // Rutas con parámetro {sesion}
+    Route::get('/{sesion}/editar', [App\Http\Controllers\MedidaController::class, 'editar'])->name('editar');
+    Route::get('/{sesion}/detalle', [App\Http\Controllers\MedidaController::class, 'show'])->name('show');
+    Route::post('/{sesion}/finalizar', [App\Http\Controllers\MedidaController::class, 'finalizarSesion'])->name('finalizar');
+    Route::delete('/{sesion}', [App\Http\Controllers\MedidaController::class, 'destroy'])->name('destroy');
+
+    // Ruta genérica con {detalle} (al final para no interferir)
+    Route::patch('/{detalle}', [App\Http\Controllers\MedidaController::class, 'actualizarMedida'])->name('actualizar');
+});
 Route::get('/users/getSedes/{user_id}', [App\Http\Controllers\UserController::class, 'getSedes'])->middleware(['auth:sanctum', 'verified'])->name('get.sedes');
 Route::post('/sedes/users', [App\Http\Controllers\UserController::class, 'storeSedes'])->middleware(['auth:sanctum', 'verified'])->name('store.sedes');
 

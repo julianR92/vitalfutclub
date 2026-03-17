@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Persona extends Model
 {
     use HasFactory;
@@ -25,6 +26,14 @@ class Persona extends Model
         'correo',
     ];
 
+     protected $casts = [
+        'fecha_nacimiento' => 'date',
+    ];
+
+    protected $appends = [
+        'nombre_completo',
+    ];
+
     public function users(){
         return $this->hasOne(User::class);
     }
@@ -35,5 +44,15 @@ class Persona extends Model
 
     public function factura(){
         return $this->hasMany(Factura::class);
+    }
+
+     public function getNombreCompletoAttribute(): string
+    {
+        return trim("{$this->nombres} {$this->apellidos}");
+    }
+
+    public function medidas()
+    {
+        return $this->hasMany(MedidaDetalle::class);
     }
 }
