@@ -33,6 +33,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 // ─── Rutas exclusivas para CLIENTES ──────────────────────────────────────────
 Route::middleware(['auth:sanctum', 'verified', 'role:cliente'])->group(function () {
     Route::get('/persona/historico', Historico::class)->name('persona.historico');
+
+    // Módulo: Mis Medidas (dashboard personal del cliente)
+    Route::get('/mis-medidas', [App\Http\Controllers\MisMedidasController::class, 'index'])->name('mis-medidas.index');
+    Route::get('/mis-medidas/datos', [App\Http\Controllers\MisMedidasController::class, 'datos'])->name('mis-medidas.datos');
 });
 
 // ─── Rutas para ADMIN y PROFESOR ─────────────────────────────────────────────
