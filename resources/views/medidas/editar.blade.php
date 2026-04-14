@@ -82,6 +82,7 @@
                                 <th class="px-3 py-3 text-center min-w-[80px]">Abdominales</th>
                                 <th class="px-3 py-3 text-center min-w-[80px]">Flexiones</th>
                                 <th class="px-3 py-3 text-center min-w-[80px]">Elasticidad<br><span class="normal-case font-normal">(cm)</span></th>
+                                <th class="px-3 py-3 text-center min-w-[85px]">Test Resist.<br><span class="normal-case font-normal text-gray-400">(Course Nav.)</span></th>
                                 <th class="px-3 py-3 text-center min-w-[160px]">Notas</th>
                                 <th class="px-3 py-3 text-center w-10"></th>
                             </tr>
@@ -183,9 +184,16 @@
 
                                     {{-- Elasticidad (cm) --}}
                                     <td class="p-0">
-                                        <input type="number" step="0.1" min="0"
+                                        <input type="number" step="0.1" min="-100"
                                             class="input-medida w-full px-2 py-2 text-center"
                                             data-campo="elasticidad" value="{{ $detalle->elasticidad ?? '' }}" placeholder="—">
+                                    </td>
+
+                                    {{-- Test Resistencia (Course Navette) --}}
+                                    <td class="p-0">
+                                        <input type="number" step="0.5" min="0" max="15"
+                                            class="input-medida w-full px-2 py-2 text-center"
+                                            data-campo="test_resistencia" value="{{ $detalle->test_resistencia ?? '' }}" placeholder="—">
                                     </td>
 
                                     {{-- Notas --}}
@@ -336,7 +344,8 @@
             const fila   = input.closest('.fila-medida');
             const detalleId = fila.dataset.id;
             const campo  = input.dataset.campo;
-            const valor  = input.value.trim();
+            // Normalizar: reemplazar coma por punto para campos numéricos
+            const valor  = input.value.trim().replace(',', '.');
 
             // No enviar si el valor no cambió (guardamos valor previo)
             if (input.dataset.previo === valor) return;

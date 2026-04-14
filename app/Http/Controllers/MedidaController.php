@@ -191,6 +191,16 @@ class MedidaController extends Controller
 
     public function actualizarMedida(Request $request, MedidaDetalle $detalle): JsonResponse
     {
+        // Normalizar separador decimal: reemplazar coma por punto en campos numéricos
+        $numericos = [
+            'altura_cm', 'peso_kg', 'imc', 'porcentaje_grasa', 'porcentaje_musculo',
+            'grasa_visceral', 'elasticidad', 'test_resistencia',
+        ];
+        $request->merge(collect($numericos)
+            ->filter(fn($f) => $request->has($f) && is_string($request->input($f)))
+            ->mapWithKeys(fn($f) => [$f => str_replace(',', '.', $request->input($f))])
+            ->all());
+
         $validated = $request->validate([
             'altura_cm'              => 'nullable|numeric|min:0|max:300',
             'peso_kg'                => 'nullable|numeric|min:0|max:500',
@@ -203,7 +213,8 @@ class MedidaController extends Controller
             'sentadillas'            => 'nullable|integer|min:0',
             'abdominales'            => 'nullable|integer|min:0',
             'flexiones'              => 'nullable|integer|min:0',
-            'elasticidad'            => 'nullable|numeric|min:0',
+            'elasticidad'            => 'nullable|numeric',
+            'test_resistencia'       => 'nullable|numeric|min:0|max:15',
             'notas'                  => 'nullable|string|max:1000',
             'status'                 => 'nullable|boolean',
             // Campos desactivados (mantenidos por compatibilidad)

@@ -29,6 +29,7 @@ class MedidaDetalle extends Model
         'abdominales',
         'flexiones',
         'elasticidad',
+        'test_resistencia',
         'orden',
         'completado',
         'status',
@@ -45,7 +46,8 @@ class MedidaDetalle extends Model
          'sentadillas'        => 'integer',
         'abdominales'        => 'integer',
         'flexiones'          => 'integer',
-        'elasticidad'        => 'integer',
+        'elasticidad'        => 'decimal:1',
+        'test_resistencia'   => 'decimal:1',
         'status'             => 'boolean',
 
     ];

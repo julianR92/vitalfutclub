@@ -78,7 +78,8 @@ class MisMedidasController extends Controller
             'sentadillas'       => $detalles->pluck('sentadillas'),
             'abdominales'       => $detalles->pluck('abdominales'),
             'flexiones'         => $detalles->pluck('flexiones'),
-            'elasticidad'       => $detalles->pluck('elasticidad'),
+            'elasticidad'        => $detalles->pluck('elasticidad'),
+            'test_resistencia'   => $detalles->pluck('test_resistencia'),
             // tabla completa
             'tabla' => $detalles->map(fn($d) => [
                 'fecha'              => optional($d->sesion)->fecha
@@ -97,6 +98,7 @@ class MisMedidasController extends Controller
                 'abdominales'        => $d->abdominales,
                 'flexiones'          => $d->flexiones,
                 'elasticidad'        => $d->elasticidad,
+                'test_resistencia'   => $d->test_resistencia,
             ]),
         ]);
     }

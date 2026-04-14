@@ -83,6 +83,7 @@
                                 <th class="px-3 py-3 text-center">Abdominales</th>
                                 <th class="px-3 py-3 text-center">Flexiones</th>
                                 <th class="px-3 py-3 text-center">Elasticidad<br><span class="normal-case font-normal">(cm)</span></th>
+                                <th class="px-3 py-3 text-center">Test Resist.<br><span class="normal-case font-normal text-gray-400">(pts)</span></th>
                                 <th class="px-3 py-3 text-center min-w-[160px]">Notas</th>
                                 <th class="px-3 py-3 text-center">Estado</th>
                             </tr>
@@ -121,8 +122,7 @@
                                     <td class="px-3 py-3 text-center text-gray-700">{{ $ent($detalle->sentadillas) }}</td>
                                     <td class="px-3 py-3 text-center text-gray-700">{{ $ent($detalle->abdominales) }}</td>
                                     <td class="px-3 py-3 text-center text-gray-700">{{ $ent($detalle->flexiones) }}</td>
-                                    <td class="px-3 py-3 text-center text-gray-700">{{ $num($detalle->elasticidad, 1) }}</td>
-                                    <td class="px-3 py-3 text-gray-500 text-xs">{{ $detalle->notas ?? '—' }}</td>
+                                    <td class="px-3 py-3 text-center text-gray-700">{{ $num($detalle->elasticidad, 1) }}</td>                                    <td class="px-3 py-3 text-center text-gray-700">{{ $num($detalle->test_resistencia, 1) }}</td>                                    <td class="px-3 py-3 text-gray-500 text-xs">{{ $detalle->notas ?? '—' }}</td>
 
                                     {{-- Estado (activo = status 1, quitado = status 0) --}}
                                     <td class="px-3 py-3 text-center">
@@ -135,7 +135,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="15" class="py-10 text-center text-gray-400 text-sm">
+                                    <td colspan="16" class="py-10 text-center text-gray-400 text-sm">
                                         No hay registros en esta sesión.
                                     </td>
                                 </tr>

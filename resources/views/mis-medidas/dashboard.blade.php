@@ -43,7 +43,7 @@
             @else
 
             {{-- ── Tarjetas resumen ──────────────────────────────────────────── --}}
-            <div id="cards-resumen" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div id="cards-resumen" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 @php
                     $cards = [
                         ['label'=>'Peso',        'key'=>'peso_kg',           'unit'=>'kg',   'icon'=>'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3',   'color'=>'orange'],
@@ -51,6 +51,7 @@
                         ['label'=>'% Grasa',     'key'=>'porcentaje_grasa',  'unit'=>'%',    'icon'=>'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',                       'color'=>'red'],
                         ['label'=>'% Músculo',   'key'=>'porcentaje_musculo','unit'=>'%',    'icon'=>'M13 10V3L4 14h7v7l9-11h-7z',                                                                                                                          'color'=>'green'],
                         ['label'=>'Gr. Visceral','key'=>'grasa_visceral',    'unit'=>'',     'icon'=>'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 'color'=>'purple'],
+                        ['label'=>'Resistencia', 'key'=>'test_resistencia',  'unit'=>'pts',  'icon'=>'M13 10V3L4 14h7v7l9-11h-7z',                                                                                                                          'color'=>'gray'],
                     ];
                     $colorMap = [
                         'orange' => ['bg'=>'bg-orange-100','text'=>'text-orange-600','dot'=>'bg-orange-400'],
@@ -58,6 +59,7 @@
                         'red'    => ['bg'=>'bg-red-100',   'text'=>'text-red-600',   'dot'=>'bg-red-400'],
                         'green'  => ['bg'=>'bg-green-100', 'text'=>'text-green-600', 'dot'=>'bg-green-400'],
                         'purple' => ['bg'=>'bg-purple-100','text'=>'text-purple-600','dot'=>'bg-purple-400'],
+                        'gray'   => ['bg'=>'bg-gray-100',  'text'=>'text-gray-600',  'dot'=>'bg-gray-400'],
                     ];
                 @endphp
 
@@ -77,6 +79,7 @@
                             <span class="text-sm text-gray-400 ml-0.5">{{ $c['unit'] }}</span>
                         </div>
                         <div data-card-diff="{{ $c['key'] }}" class="text-xs text-gray-400"></div>
+                        <div data-card-badge="{{ $c['key'] }}" class="text-xs"></div>
                     </div>
                 @endforeach
             </div>
@@ -113,6 +116,15 @@
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">🏋️ Rendimiento Físico</h3>
                     <div class="relative" style="height:220px">
                         <canvas id="chart-rendimiento"></canvas>
+                    </div>
+                </div>
+
+                {{-- Test Resistencia (Course Navette) --}}
+                <div class="bg-white rounded-2xl shadow p-5 lg:col-span-2">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-1">🏃 Resistencia Cardiovascular (Course Navette)</h3>
+                    <p class="text-xs text-gray-400 mb-4">Línea de referencia: promedio 8.5 pts (adultos 17+)</p>
+                    <div class="relative" style="height:200px">
+                        <canvas id="chart-resistencia"></canvas>
                     </div>
                 </div>
             </div>
@@ -202,12 +214,13 @@
                                 <th class="px-3 py-3 text-center hidden md:table-cell">Abd.</th>
                                 <th class="px-3 py-3 text-center hidden md:table-cell">Flex.</th>
                                 <th class="px-3 py-3 text-center hidden md:table-cell">Elast.</th>
+                                <th class="px-3 py-3 text-center hidden md:table-cell">Resist.</th>
                                 <th class="px-3 py-3 text-center">TMB</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-historial">
                             <tr id="fila-cargando">
-                                <td colspan="13" class="py-8 text-center text-gray-400 text-sm">
+                                <td colspan="14" class="py-8 text-center text-gray-400 text-sm">
                                     <svg class="animate-spin w-5 h-5 mx-auto mb-2 text-orange-400" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
@@ -320,6 +333,7 @@
                 porcentaje_grasa   : d.porcentaje_grasa,
                 porcentaje_musculo : d.porcentaje_musculo,
                 grasa_visceral     : d.grasa_visceral,
+                test_resistencia   : d.test_resistencia,
             };
 
             Object.entries(campos).forEach(([key, arr]) => {
@@ -340,6 +354,32 @@
                     elDiff.innerHTML = `<span class="${cls}">${sign}${Math.abs(diff).toFixed(1)}</span> vs anterior`;
                 }
             });
+
+            // ── Badge IMC ──────────────────────────────────────────────────
+            const lastImc = ultimoValido(d.imc);
+            const badgeImc = document.querySelector('[data-card-badge="imc"]');
+            if (badgeImc && lastImc !== null) {
+                const v = parseFloat(lastImc);
+                let cls = 'bg-green-100 text-green-700';
+                let label = 'Normal';
+                if      (v < 18.5)              { cls = 'bg-blue-100 text-blue-700';   label = 'Bajo Peso'; }
+                else if (v >= 25 && v < 30)     { cls = 'bg-yellow-100 text-yellow-700'; label = 'Sobrepeso'; }
+                else if (v >= 30)               { cls = 'bg-red-100 text-red-700';     label = 'Obesidad'; }
+                badgeImc.innerHTML = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${cls}">${label}</span>`;
+            }
+
+            // ── Badge Grasa Visceral ───────────────────────────────────────
+            const lastGV = ultimoValido(d.grasa_visceral);
+            const badgeGV = document.querySelector('[data-card-badge="grasa_visceral"]');
+            if (badgeGV && lastGV !== null) {
+                const v = parseFloat(lastGV);
+                let cls = 'bg-green-100 text-green-700';
+                let label = 'Excelente';
+                if      (v > 15)                { cls = 'bg-red-100 text-red-700';       label = 'Peligroso'; }
+                else if (v > 10)                { cls = 'bg-yellow-100 text-yellow-700'; label = 'Aceptable'; }
+                else if (v > 5)                 { cls = 'bg-blue-100 text-blue-700';     label = 'Bueno'; }
+                badgeGV.innerHTML = `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${cls}">${label}</span>`;
+            }
         }
 
         // ── Gráficos ────────────────────────────────────────────────────────
@@ -375,11 +415,29 @@
                         legend: { display: true, position: 'top' },
                         annotation: {
                             annotations: {
-                                normal: {
+                                zona_bajo: {
+                                    type: 'box', yMin: 0, yMax: 18.5,
+                                    backgroundColor: 'rgba(59,130,246,.07)',
+                                    borderColor: 'transparent', borderWidth: 0,
+                                    label: { display: true, content: 'Bajo Peso (<18.5)', color: '#3b82f6', font: { size: 9 }, position: { x: 'start', y: 'start' } },
+                                },
+                                zona_normal: {
                                     type: 'box', yMin: 18.5, yMax: 24.9,
                                     backgroundColor: 'rgba(34,197,94,.08)',
-                                    borderColor: 'rgba(34,197,94,.3)', borderWidth: 1,
-                                    label: { display: true, content: 'Normal (18.5–24.9)', color: '#22c55e', font: { size: 10 } },
+                                    borderColor: 'rgba(34,197,94,.25)', borderWidth: 1,
+                                    label: { display: true, content: 'Normal (18.5–24.9)', color: '#16a34a', font: { size: 9 }, position: { x: 'start', y: 'start' } },
+                                },
+                                zona_sobrepeso: {
+                                    type: 'box', yMin: 25, yMax: 30,
+                                    backgroundColor: 'rgba(234,179,8,.07)',
+                                    borderColor: 'transparent', borderWidth: 0,
+                                    label: { display: true, content: 'Sobrepeso (25–29.9)', color: '#ca8a04', font: { size: 9 }, position: { x: 'start', y: 'start' } },
+                                },
+                                zona_obesidad: {
+                                    type: 'box', yMin: 30, yMax: 55,
+                                    backgroundColor: 'rgba(239,68,68,.07)',
+                                    borderColor: 'transparent', borderWidth: 0,
+                                    label: { display: true, content: 'Obesidad (≥30)', color: '#dc2626', font: { size: 9 }, position: { x: 'start', y: 'start' } },
                                 },
                             },
                         },
@@ -435,6 +493,37 @@
                     },
                 },
             });
+
+            // Test Resistencia (Course Navette)
+            if (d.test_resistencia && d.test_resistencia.some(v => v !== null)) {
+                new Chart('chart-resistencia', {
+                    type: 'line',
+                    data: { labels: L, datasets: [lineDataset('Course Navette (pts)', d.test_resistencia, 'gray')] },
+                    options: {
+                        ...baseLineOpts(L),
+                        plugins: {
+                            ...baseLineOpts(L).plugins,
+                            legend: { display: true, position: 'top' },
+                            tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} pts` } },
+                            annotation: {
+                                annotations: {
+                                    promedio: {
+                                        type: 'line', yMin: 8.5, yMax: 8.5,
+                                        borderColor: 'rgba(249,115,22,.7)',
+                                        borderWidth: 1.5,
+                                        borderDash: [5, 4],
+                                        label: { display: true, content: 'Ref. promedio 8.5', color: '#f97316', font: { size: 10 }, position: 'start' },
+                                    },
+                                },
+                            },
+                        },
+                        scales: {
+                            ...baseLineOpts(L).scales,
+                            y: { ...baseLineOpts(L).scales.y, min: 0, max: 15, ticks: { stepSize: 2.5 } },
+                        },
+                    },
+                });
+            }
 
             // Donut — último registro
             const lastGrasa   = ultimoValido(d.porcentaje_grasa)   ?? 0;
@@ -528,7 +617,7 @@
             const slice = filasTodas.slice((paginaTabla - 1) * POR_PAG, paginaTabla * POR_PAG);
 
             if (!slice.length) {
-                tbody.innerHTML = `<tr><td colspan="13" class="py-8 text-center text-gray-400">Sin resultados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="14" class="py-8 text-center text-gray-400">Sin resultados.</td></tr>`;
                 document.getElementById('pie-tabla').classList.add('hidden');
                 return;
             }
@@ -547,6 +636,7 @@
                     <td class="text-center hidden md:table-cell">${r.abdominales ?? '—'}</td>
                     <td class="text-center hidden md:table-cell">${r.flexiones ?? '—'}</td>
                     <td class="text-center hidden md:table-cell">${r.elasticidad !== null ? n(r.elasticidad) : '—'}</td>
+                    <td class="text-center hidden md:table-cell">${r.test_resistencia !== null ? n(r.test_resistencia) : '—'}</td>
                     <td class="text-center">${r.tmb ?? '—'}</td>
                 </tr>
             `).join('');
@@ -563,7 +653,7 @@
             const act    = `${base} bg-orange-500 text-white border-orange-400 font-semibold`;
             const nor    = `${base} border-gray-200 text-gray-600 hover:bg-gray-50`;
             const dis    = `${base} border-gray-100 text-gray-300 cursor-not-allowed`;
-            let h = `<button class="btn-pag-t ${paginaTabla===1?dis:nor}" data-p="${paginaTabla-1}" ${paginaTabla===1?'disabled':''}>‹</button>`;
+                let h = `<button class="btn-pag-t ${paginaTabla===1?dis:nor}" data-p="${paginaTabla-1}" ${paginaTabla===1?'disabled':''}>&#8249;</button>`;
             for (let i = 1; i <= pags; i++) {
                 h += `<button class="btn-pag-t ${i===paginaTabla?act:nor}" data-p="${i}">${i}</button>`;
             }
